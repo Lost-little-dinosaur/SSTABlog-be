@@ -89,8 +89,8 @@ func CheckCatalogueExistByName(catalogueName string, id string) bool { //目录�
 	return true
 }
 
-func RenameCatalogue(id string, newCatalogueName string) error { //重命名前先检查是否存在以及是否同级目录下是否重名
-	return GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("id = ?", id).Update("catalogue_name", newCatalogueName).Error
+func RenameCatalogue(id string, newCatalogueName string, uid string) error { //重命名前先检查是否存在以及是否同级目录下是否重名
+	return GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("id = ?", id).Update("catalogue_name", newCatalogueName).Update("last_modifier", uid).Error
 }
 
 func DeleteCatalogue(id string) error { //todo 回收站功能
@@ -114,12 +114,12 @@ func DeleteCatalogue(id string) error { //todo 回收站功能
 	return nil
 }
 
-func UpdateCatalogueDescription(id string, newDescription string) error {
-	return GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("id = ?", id).Update("description", newDescription).Error
+func UpdateCatalogueDescription(id string, newDescription string, uid string) error {
+	return GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("id = ?", id).Update("description", newDescription).Update("last_modifier", uid).Error
 }
 
-func UpdateCatalogueFather(id string, newFatherID string) error {
-	return GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("id = ?", id).Update("father_id", newFatherID).Error
+func UpdateCatalogueFather(id string, newFatherID string, uid string) error {
+	return GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("id = ?", id).Update("father_id", newFatherID).Update("last_modifier", uid).Error
 }
 func GetCatalogueFatherID(id string) (string, error) {
 	catalogue := &Mysql.Catalogue{}
@@ -129,18 +129,36 @@ func GetCatalogueFatherID(id string) (string, error) {
 	return catalogue.FatherID, nil
 }
 
-func SearchCatalogue(keyword string) ([]Mysql.Catalogue, error) {
-	var catalogues, tempStruct []Mysql.Catalogue
-	var err error
-	if err = GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("catalogue_name LIKE ?", "%"+keyword+"%").Order("catalogue_name").Find(&tempStruct).Error; err != nil { //默认对目录按照目录名称排序
+func SearchCatalogueByName(keyword string) ([]Mysql.Catalogue, error) {
+	var catalogues []Mysql.Catalogue
+	if err := GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("catalogue_name LIKE ?", "%"+keyword+"%").Order("catalogue_name").Find(&catalogues).Error; err != nil { //默认对目录按照目录名称排序
 		return nil, err
 	}
-	catalogues = append(catalogues, tempStruct...)
-	if err = GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("description LIKE ?", "%"+keyword+"%").Order("catalogue_name").Find(&tempStruct).Error; err != nil { //默认对目录按照目录名称排序
-		return nil, err
-	}
-	catalogues = append(catalogues, tempStruct...)
 	return catalogues, nil
+}
+
+func SearchCatalogueByDescription(keyword string) ([]Mysql.Catalogue, error) {
+	var catalogues []Mysql.Catalogue
+	if err := GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("description LIKE ?", "%"+keyword+"%").Order("catalogue_name").Find(&catalogues).Error; err != nil { //默认对目录按照目录名称排序
+		return nil, err
+	}
+	return catalogues, nil
+}
+
+func GetCatalogueRoute(id string) ([]string, error) { //获取目录路径
+	var tempCatalogue = &Mysql.Catalogue{}
+
+	if err := GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("id = ?", id).First(tempCatalogue).Error; err != nil {
+		return nil, err
+	}
+	route := []string{tempCatalogue.CatalogueName}
+	for tempCatalogue.FatherID != "" {
+		if err := GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("id = ?", tempCatalogue.FatherID).First(tempCatalogue).Error; err != nil {
+			return nil, err
+		}
+		route = append(route, tempCatalogue.CatalogueName)
+	}
+	return route, nil
 }
 
 //func CheckCatalogueValidForUpdateName(id string, newName string) bool { //返回true表示存在

@@ -1,7 +1,7 @@
 package catalogue
 
 import (
-	"github.com/wujunyi792/crispy-waffle-be/internal/dto/artile"
+	"github.com/wujunyi792/crispy-waffle-be/internal/dto/article"
 	"time"
 )
 
@@ -12,23 +12,26 @@ type AddCatalogueRequest struct {
 }
 
 type GetCatalogueSonResponse struct {
-	RootCatalogueID  string    `json:"rootCatalogueID"`
-	CatalogueName    string    `json:"catalogueName"`
-	Description      string    `json:"description"`
-	CreateBy         string    `json:"createBy"`
-	CreateOrUpdateAt time.Time `json:"createOrUpdateAt"`
-	SonArr           []Son     `json:"sonArr"`
+	RootCatalogueID  string                           `json:"rootCatalogueID"`
+	CatalogueName    string                           `json:"catalogueName"`
+	LastModifier     string                           `json:"lastModifier"`
+	Description      string                           `json:"description"`
+	CreateBy         string                           `json:"createBy"`
+	CreateOrUpdateAt time.Time                        `json:"createOrUpdateAt"`
+	SonArr           []Son                            `json:"sonArr"`
+	ArticleArr       []article.GetArticleInfoResponse `json:"articleArr"`
 }
 
 type Son struct {
-	CatalogueName    string    `json:"catalogueName"`
-	Description      string    `json:"description"`
-	CatalogueID      string    `json:"catalogueID"`
-	CreateBy         string    `json:"createBy"`
-	CreateOrUpdateAt time.Time `json:"createOrUpdateAt"`
+	CatalogueName    string                           `json:"catalogueName"`
+	Description      string                           `json:"description"`
+	CatalogueID      string                           `json:"catalogueID"`
+	CreateBy         string                           `json:"createBy"`
+	LastModifier     string                           `json:"lastModifier"`
+	CreateOrUpdateAt time.Time                        `json:"createOrUpdateAt"`
+	ArticleArr       []article.GetArticleInfoResponse `json:"articleArr"`
+	SonArr           []Son                            `json:"sonArr"`
 	//FatherID      string    `json:"fatherID"`
-	ArticleArr []artile.Article `json:"articleArr"`
-	SonArr     []Son            `json:"sonArr"`
 }
 
 type GetCatalogueResponse struct {
@@ -36,6 +39,7 @@ type GetCatalogueResponse struct {
 	CatalogueName    string    `json:"catalogueName"`
 	Description      string    `json:"description"`
 	CreateBy         string    `json:"createBy"`
+	LastModifier     string    `json:"lastModifier"`
 	CreateOrUpdateAt time.Time `json:"createdOrUpdateAt"`
 	FatherID         string    `json:"fatherID"`
 }

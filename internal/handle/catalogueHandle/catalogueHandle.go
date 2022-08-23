@@ -2,8 +2,10 @@ package catalogueHandle
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/wujunyi792/crispy-waffle-be/internal/controller/articles"
 	"github.com/wujunyi792/crispy-waffle-be/internal/controller/catalogues"
 	"github.com/wujunyi792/crispy-waffle-be/internal/controller/users"
+	"github.com/wujunyi792/crispy-waffle-be/internal/dto/article"
 	"github.com/wujunyi792/crispy-waffle-be/internal/dto/catalogue"
 	serviceErr "github.com/wujunyi792/crispy-waffle-be/internal/dto/err"
 	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
@@ -65,6 +67,7 @@ func HandleAddCatalogue(c *gin.Context) {
 		CatalogueName:    req.CatalogueName,
 		Description:      req.Description,
 		CreateBy:         uid,
+		LastModifier:     uid,
 		CreateOrUpdateAt: time.Now(),
 		FatherID:         req.FatherID,
 	})
@@ -83,7 +86,9 @@ func HandleGetAllCatalogueSon(c *gin.Context) { //todo 增加返回排序
 			CatalogueName:   "",
 			Description:     "这里是顶层目录",
 			CreateBy:        "迷失的蓝色小恐龙",
+			LastModifier:    "迷失的蓝色小恐龙",
 			SonArr:          sonArr,
+			//ArticleArr: //顶层目录下不能有文章
 		})
 	} else {
 		if catalogues.CheckCatalogueExist(catalogueID) == nil {
@@ -101,13 +106,21 @@ func HandleGetAllCatalogueSon(c *gin.Context) { //todo 增加返回排序
 			middleware.Fail(c, serviceErr.InternalErr)
 			return
 		}
+		var tempArticleArr []article.GetArticleInfoResponse
+		err, tempArticleArr = GetArticlesByCatalogueID(tempStruct.ID)
+		if err != nil {
+			middleware.Fail(c, serviceErr.InternalErr)
+			return
+		}
 		middleware.Success(c, catalogue.GetCatalogueSonResponse{
 			RootCatalogueID:  tempStruct.ID,
 			CatalogueName:    tempStruct.CatalogueName,
+			LastModifier:     tempStruct.LastModifier,
 			Description:      tempStruct.Description,
 			CreateBy:         tempStruct.CreateBy,
 			CreateOrUpdateAt: tempStruct.UpdatedAt,
 			SonArr:           sonArr,
+			ArticleArr:       tempArticleArr, //当前目录下的文章
 		})
 		return
 	}
@@ -125,7 +138,9 @@ func HandleGetCatalogueSon(c *gin.Context) { //非递归获取子目录
 			CatalogueName:   "",
 			Description:     "这里是顶层目录",
 			CreateBy:        "迷失的蓝色小恐龙",
+			LastModifier:    "迷失的蓝色小恐龙",
 			SonArr:          sonArr,
+			//ArticleArr: //顶层目录下不能有文章
 		})
 	} else {
 		if catalogues.CheckCatalogueExist(catalogueID) == nil {
@@ -143,13 +158,21 @@ func HandleGetCatalogueSon(c *gin.Context) { //非递归获取子目录
 			middleware.Fail(c, serviceErr.InternalErr)
 			return
 		}
+		var tempArticleArr []article.GetArticleInfoResponse
+		err, tempArticleArr = GetArticlesByCatalogueID(tempStruct.ID)
+		if err != nil {
+			middleware.Fail(c, serviceErr.InternalErr)
+			return
+		}
 		middleware.Success(c, catalogue.GetCatalogueSonResponse{
 			RootCatalogueID:  tempStruct.ID,
 			CatalogueName:    tempStruct.CatalogueName,
+			LastModifier:     tempStruct.LastModifier,
 			Description:      tempStruct.Description,
 			CreateBy:         tempStruct.CreateBy,
 			CreateOrUpdateAt: tempStruct.UpdatedAt,
 			SonArr:           sonArr,
+			ArticleArr:       tempArticleArr,
 		})
 		return
 	}
@@ -159,11 +182,13 @@ func GetCatalogueSon(catalogueID string) (error, []catalogue.Son) { //非递归�
 	var err error
 	var tempCatalogue []Mysql.Catalogue
 	var returnSonArr []catalogue.Son
+	var tempArticleArr []article.GetArticleInfoResponse
 	tempCatalogue, err = catalogues.GetCatalogueSons(catalogueID)
 	if err != nil {
 		return err, nil
 	}
 	for _, v := range tempCatalogue {
+		err, tempArticleArr = GetArticlesByCatalogueID(v.ID)
 		if err != nil {
 			return err, nil
 		}
@@ -172,9 +197,11 @@ func GetCatalogueSon(catalogueID string) (error, []catalogue.Son) { //非递归�
 			CatalogueName:    v.CatalogueName,
 			Description:      v.Description,
 			CreateBy:         v.CreateBy,
+			LastModifier:     v.LastModifier,
 			CreateOrUpdateAt: v.UpdatedAt,
+			ArticleArr:       tempArticleArr,
 		})
-		//todo 找每一个目录下的文章
+		tempArticleArr = nil
 	}
 	return nil, returnSonArr
 }
@@ -183,6 +210,7 @@ func GetAllCatalogueSon(catalogueID string) (error, []catalogue.Son) { //递归�
 	var err error
 	var tempCatalogue []Mysql.Catalogue
 	var returnSonArr, tempArr []catalogue.Son
+	var tempArticleArr []article.GetArticleInfoResponse
 	tempCatalogue, err = catalogues.GetCatalogueSons(catalogueID)
 	if err != nil {
 		return err, nil
@@ -192,18 +220,44 @@ func GetAllCatalogueSon(catalogueID string) (error, []catalogue.Son) { //递归�
 		if err != nil {
 			return err, nil
 		}
+		err, tempArticleArr = GetArticlesByCatalogueID(v.ID) //获取当前目录下的文章
+		if err != nil {
+			return err, nil
+		}
 		returnSonArr = append(returnSonArr, catalogue.Son{
 			CatalogueID:      v.ID,
 			CatalogueName:    v.CatalogueName,
 			Description:      v.Description,
 			CreateBy:         v.CreateBy,
+			LastModifier:     v.LastModifier,
 			CreateOrUpdateAt: v.UpdatedAt,
-			//FatherID:      v.FatherID,
-			SonArr: tempArr,
+			SonArr:           tempArr,
+			ArticleArr:       tempArticleArr,
 		})
-		//todo 找每一个目录下的文章
+		tempArticleArr = nil
 	}
 	return nil, returnSonArr
+}
+func GetArticlesByCatalogueID(catalogueID string) (error, []article.GetArticleInfoResponse) {
+	var tempArticleArr []article.GetArticleInfoResponse
+	articleArr, err := articles.GetArticlesByCatalogueID(catalogueID)
+	if err != nil {
+		return err, nil
+	}
+	for _, vv := range articleArr {
+		tempArticleArr = append(tempArticleArr, article.GetArticleInfoResponse{
+			ID:            vv.ID,
+			Title:         vv.Title,
+			Cover:         vv.Cover,
+			CreateBy:      vv.CreateBy,
+			LastModifier:  vv.LastModifier,
+			CatalogueID:   vv.CatalogueID,
+			Description:   vv.Description,
+			CommentNumber: vv.CommentNumber,
+			PraiseNumber:  vv.PraiseNumber,
+		})
+	}
+	return err, tempArticleArr
 }
 
 func HandleGetCatalogue(c *gin.Context) {
@@ -222,6 +276,7 @@ func HandleGetCatalogue(c *gin.Context) {
 		CatalogueName:    tempStruct.CatalogueName,
 		Description:      tempStruct.Description,
 		CreateBy:         tempStruct.CreateBy,
+		LastModifier:     tempStruct.LastModifier,
 		CreateOrUpdateAt: tempStruct.UpdatedAt,
 		FatherID:         tempStruct.FatherID,
 	})
@@ -229,6 +284,16 @@ func HandleGetCatalogue(c *gin.Context) {
 }
 
 func HandleUpdateCatalogueName(c *gin.Context) {
+	cuid, _ := c.Get("uid")
+	if cuid == nil {
+		middleware.FailWithCode(c, 40214, "请先登录")
+		return
+	}
+	uid := cuid.(string)
+	if !users.PermissionCheck(uid, "1") { //需要1或0级权限
+		middleware.FailWithCode(c, 40216, "对不起，您没有权限")
+		return
+	}
 	var req catalogue.UpdateCatalogueNameRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		middleware.Fail(c, serviceErr.RequestErr)
@@ -255,7 +320,7 @@ func HandleUpdateCatalogueName(c *gin.Context) {
 		middleware.FailWithCode(c, 40217, "同级目录下目录不可同名")
 		return
 	}
-	err = catalogues.RenameCatalogue(req.CatalogueID, req.CatalogueNewName)
+	err = catalogues.RenameCatalogue(req.CatalogueID, req.CatalogueNewName, uid)
 	if err != nil {
 		middleware.Fail(c, serviceErr.InternalErr)
 		return
@@ -265,6 +330,16 @@ func HandleUpdateCatalogueName(c *gin.Context) {
 }
 
 func HandleUpdateCatalogueDescription(c *gin.Context) {
+	cuid, _ := c.Get("uid")
+	if cuid == nil {
+		middleware.FailWithCode(c, 40214, "请先登录")
+		return
+	}
+	uid := cuid.(string)
+	if !users.PermissionCheck(uid, "1") { //需要1或0级权限
+		middleware.FailWithCode(c, 40216, "对不起，您没有权限")
+		return
+	}
 	var req catalogue.UpdateCatalogueDescriptionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		middleware.Fail(c, serviceErr.RequestErr)
@@ -278,7 +353,7 @@ func HandleUpdateCatalogueDescription(c *gin.Context) {
 		middleware.FailWithCode(c, 40220, "描述过长")
 		return
 	}
-	err := catalogues.UpdateCatalogueDescription(req.CatalogueID, req.NewDescription)
+	err := catalogues.UpdateCatalogueDescription(req.CatalogueID, req.NewDescription, uid)
 	if err != nil {
 		middleware.Fail(c, serviceErr.InternalErr)
 		return
@@ -288,6 +363,16 @@ func HandleUpdateCatalogueDescription(c *gin.Context) {
 }
 
 func HandleUpdateCatalogueFather(c *gin.Context) {
+	cuid, _ := c.Get("uid")
+	if cuid == nil {
+		middleware.FailWithCode(c, 40214, "请先登录")
+		return
+	}
+	uid := cuid.(string)
+	if !users.PermissionCheck(uid, "1") { //需要1或0级权限
+		middleware.FailWithCode(c, 40216, "对不起，您没有权限")
+		return
+	}
 	var req catalogue.UpdateCatalogueParentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		middleware.Fail(c, serviceErr.RequestErr)
@@ -306,7 +391,7 @@ func HandleUpdateCatalogueFather(c *gin.Context) {
 		middleware.FailWithCode(c, 40217, "同级目录下目录不可同名")
 		return
 	}
-	err = catalogues.UpdateCatalogueFather(req.CatalogueID, req.NewFatherID)
+	err = catalogues.UpdateCatalogueFather(req.CatalogueID, req.NewFatherID, uid)
 	if err != nil {
 		middleware.Fail(c, serviceErr.InternalErr)
 		return
@@ -316,6 +401,17 @@ func HandleUpdateCatalogueFather(c *gin.Context) {
 }
 
 func HandleDeleteCatalogue(c *gin.Context) {
+	cuid, _ := c.Get("uid")
+	if cuid == nil {
+		middleware.FailWithCode(c, 40214, "请先登录")
+		return
+	}
+	uid := cuid.(string)
+	if !users.PermissionCheck(uid, "1") { //需要1或0级权限
+		middleware.FailWithCode(c, 40216, "对不起，您没有权限")
+		return
+	}
+
 	var req catalogue.DeleteCatalogueRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		middleware.Fail(c, serviceErr.RequestErr)
@@ -330,20 +426,46 @@ func HandleDeleteCatalogue(c *gin.Context) {
 		middleware.Fail(c, serviceErr.InternalErr)
 		return
 	}
+	//删除目录后，删除目录下的所有文件
+	var tempArticleArr []article.GetArticleInfoResponse
+	err, tempArticleArr = GetArticlesByCatalogueID(req.CatalogueID)
+	if err != nil {
+		middleware.Fail(c, serviceErr.InternalErr)
+		return
+	}
+	for _, v := range tempArticleArr {
+		err = articles.DeleteArticle(v.ID)
+		if err != nil {
+			middleware.Fail(c, serviceErr.InternalErr)
+			return
+		}
+	}
 	middleware.Success(c, nil)
 	return
 }
 
 func HandleSearchCataloogue(c *gin.Context) { //todo 分页、文章查询
 	keyWord := c.Query("keyWord")
+	searchRange := c.Query("searchRange")
 	if len(keyWord) == 0 {
 		middleware.FailWithCode(c, 40221, "搜索关键词不能为空")
 		return
 	}
-	returnCatalogues, err := catalogues.SearchCatalogue(keyWord)
-	if err != nil {
-		middleware.Fail(c, serviceErr.InternalErr)
+	if searchRange == "description" {
+		returnCatalogues, err := catalogues.SearchCatalogueByDescription(keyWord)
+		if err != nil {
+			middleware.Fail(c, serviceErr.InternalErr)
+			return
+		}
+		middleware.Success(c, returnCatalogues)
+		return
+	} else { //默认搜索名称
+		returnCatalogues, err := catalogues.SearchCatalogueByName(keyWord)
+		if err != nil {
+			middleware.Fail(c, serviceErr.InternalErr)
+			return
+		}
+		middleware.Success(c, returnCatalogues)
 		return
 	}
-	middleware.Success(c, returnCatalogues)
 }

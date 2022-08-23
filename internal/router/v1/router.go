@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/wujunyi792/crispy-waffle-be/config"
 	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
+	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/articleRouter"
 	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/baseServiceRouter"
 	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/catalogueRouter"
 	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/fileRouter"
@@ -36,4 +37,5 @@ func MainRouter(e *gin.Engine) {
 	userRouter.InitUserRouter(e)
 	oauthRouter.InitOauthRouter(e)
 	catalogueRouter.InitCatalogueRouter(e)
+	articleRouter.InitArticleRouter(e)
 }

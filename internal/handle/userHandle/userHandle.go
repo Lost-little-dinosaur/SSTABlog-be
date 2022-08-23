@@ -16,6 +16,7 @@ import (
 	"github.com/wujunyi792/crispy-waffle-be/pkg/utils/crypto"
 	"github.com/wujunyi792/crispy-waffle-be/pkg/utils/gen/cmscode"
 	"github.com/wujunyi792/crispy-waffle-be/pkg/utils/gen/xrandom"
+	"strings"
 	"time"
 )
 
@@ -113,7 +114,7 @@ func HandleGeneralLogin(c *gin.Context) {
 		return
 	}
 
-	if len(req.Info) != 11 && req.Info != "admin" { //如果是admin登录，则不需要验证手机号
+	if len(req.Info) != 11 && !strings.Contains(req.Info, "admin") { //如果是admin登录，则不需要验证手机号
 		middleware.Fail(c, serviceErr.LoginErr)
 		return
 	}
