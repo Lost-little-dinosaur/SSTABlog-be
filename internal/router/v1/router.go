@@ -8,8 +8,10 @@ import (
 	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/articleRouter"
 	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/baseServiceRouter"
 	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/catalogueRouter"
+	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/draftBoxRouter"
 	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/fileRouter"
 	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/oauthRouter"
+	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/recycleBinRouter"
 	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/userRouter"
 )
 
@@ -38,4 +40,6 @@ func MainRouter(e *gin.Engine) {
 	oauthRouter.InitOauthRouter(e)
 	catalogueRouter.InitCatalogueRouter(e)
 	articleRouter.InitArticleRouter(e)
+	recycleBinRouter.InitRecycleBinRouter(e)
+	draftBoxRouter.InitDraftBoxRouter(e)
 }

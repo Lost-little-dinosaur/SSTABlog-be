@@ -2,6 +2,7 @@ package articles
 
 import (
 	"github.com/wujunyi792/crispy-waffle-be/internal/db"
+	"github.com/wujunyi792/crispy-waffle-be/internal/dto/article"
 	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
 	"github.com/wujunyi792/crispy-waffle-be/internal/model/Mysql"
 	"gorm.io/gorm"
@@ -79,39 +80,47 @@ func UpdateArticle(article *Mysql.Article, id string) error {
 		Error
 }
 
-func DeleteArticle(id string) error {
-	return GetManage().getGOrmDB().Model(&Mysql.Article{}).Where("id = ?", id).Delete(&Mysql.Article{}).Error
+func DeleteArticle(id string, uid string) error {
+	return GetManage().getGOrmDB().Model(&Mysql.Article{}).Where("id = ?", id).
+		Update("last_modifier", uid). //更新最后修改人
+		Delete(&Mysql.Article{}).Error
+}
+
+func DeleteArticlesByCatalogueID(catalogueID string, uid string) error {
+	return GetManage().getGOrmDB().Model(&Mysql.Article{}).Where("catalogue_id = ?", catalogueID).
+		Update("last_modifier", uid). //更新最后修改人
+		Delete(&Mysql.Article{}).Error
 }
 
 func CheckArticleExistByCatalogueIDAndTitle(catalogueID string, title string) bool {
-	article := &Mysql.Article{}
-	if err := GetManage().getGOrmDB().Model(&Mysql.Article{}).Where("catalogue_id = ? and title = ?", catalogueID, title).First(article).Error; err != nil {
+	tempArticle := &Mysql.Article{}
+	if err := GetManage().getGOrmDB().Model(&Mysql.Article{}).Where("catalogue_id = ? and title = ?", catalogueID, title).First(tempArticle).Error; err != nil {
 		return false
 	}
 	return true
 }
 func CheckArticleExistByID(id string) (bool, string) {
-	article := &Mysql.Article{}
-	if err := GetManage().getGOrmDB().Model(&Mysql.Article{}).Where("id = ?", id).First(article).Error; err != nil {
+	tempArticle := &Mysql.Article{}
+	if err := GetManage().getGOrmDB().Model(&Mysql.Article{}).Where("id = ?", id).First(tempArticle).Error; err != nil {
 		return false, ""
 	}
-	return true, article.CreateBy
+	return true, tempArticle.CreateBy
 }
 
 func GetArticleByID(id string) (*Mysql.Article, error) {
-	article := &Mysql.Article{}
-	if err := GetManage().getGOrmDB().Model(&Mysql.Article{}).Where("id = ?", id).First(article).Error; err != nil {
+	tempArticle := &Mysql.Article{}
+	if err := GetManage().getGOrmDB().Model(&Mysql.Article{}).Where("id = ?", id).First(tempArticle).Error; err != nil {
 		return nil, err
 	}
-	return article, nil
+	return tempArticle, nil
 }
 
 func GetArticleCatalogueIDAndTitleByID(id string) (string, string, error) {
-	article := &Mysql.Article{}
-	if err := GetManage().getGOrmDB().Model(&Mysql.Article{}).Where("id = ?", id).First(article).Error; err != nil {
+	tempArticle := &Mysql.Article{}
+	if err := GetManage().getGOrmDB().Model(&Mysql.Article{}).Where("id = ?", id).First(tempArticle).Error; err != nil {
 		return "", "", err
 	}
-	return article.CatalogueID, article.Title, nil
+	return tempArticle.CatalogueID, tempArticle.Title, nil
 }
 
 func GetArticlesByCatalogueID(catalogueID string) ([]Mysql.Article, error) {
@@ -120,4 +129,51 @@ func GetArticlesByCatalogueID(catalogueID string) ([]Mysql.Article, error) {
 		return nil, err
 	}
 	return articles, nil
+}
+
+func GetDeletedArticlesByCatalogueID(catalogueID string) ([]Mysql.Article, error) {
+	articles := make([]Mysql.Article, 0)
+	if err := GetManage().getGOrmDB().Unscoped().Model(&Mysql.Article{}).Where("catalogue_id = ? AND deleted_at IS NOT NULL", catalogueID).Find(&articles).Error; err != nil {
+		return nil, err
+	}
+	return articles, nil
+}
+
+func GetDeletedArticleInfo(uid string) ([]article.GetArticleInfoResponse, error) { //获取已删除的文章，自己只能看到自己删除的文章
+	articles := make([]Mysql.Article, 0)
+	if err := GetManage().getGOrmDB().Unscoped().Model(&Mysql.Article{}).Where("last_modifier = ? AND deleted_at IS NOT NULL", uid).Find(&articles).Error; err != nil {
+		return nil, err
+	}
+	var tempReturnArr []article.GetArticleInfoResponse
+	for _, v := range articles {
+		tempReturnArr = append(tempReturnArr, article.GetArticleInfoResponse{
+
+			CatalogueID:   v.CatalogueID,
+			Title:         v.Title,
+			Description:   v.Description,
+			CreateBy:      v.CreateBy,
+			LastModifier:  v.LastModifier,
+			Cover:         v.Cover,
+			ID:            v.ID,
+			CommentNumber: v.CommentNumber,
+			PraiseNumber:  v.PraiseNumber,
+		})
+	}
+	return tempReturnArr, nil
+}
+
+func CheckIfArticleDeleted(uid string, id string) error {
+	tempArticle := &Mysql.Article{}
+	if err := GetManage().getGOrmDB().Unscoped().Model(&Mysql.Article{}).Where("last_modifier = ? AND deleted_at IS NOT NULL  AND id = ?", uid, id).First(tempArticle).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func DeleteArticleForever(id string) error {
+	return GetManage().getGOrmDB().Model(&Mysql.Article{}).Unscoped().Where("id = ?", id).Delete(&Mysql.Article{}).Error
+}
+
+func RestoreArticle(id string) error {
+	return GetManage().getGOrmDB().Model(&Mysql.Article{}).Unscoped().Where("id = ?", id).Update("deleted_at", nil).Error
 }

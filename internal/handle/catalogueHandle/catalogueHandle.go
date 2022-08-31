@@ -57,6 +57,7 @@ func HandleAddCatalogue(c *gin.Context) {
 		Description:   req.Description,
 		CreateBy:      uid,
 		FatherID:      req.FatherID,
+		LastModifier:  uid,
 	})
 	if err != nil {
 		middleware.Fail(c, serviceErr.InternalErr)
@@ -84,7 +85,7 @@ func HandleGetAllCatalogueSon(c *gin.Context) { //todo 增加返回排序
 		middleware.Success(c, catalogue.GetCatalogueSonResponse{
 			RootCatalogueID: "",
 			CatalogueName:   "",
-			Description:     "这里是顶层目录",
+			Description:     "这里是顶层目录，其下不能有文章，只能有子目录",
 			CreateBy:        "迷失的蓝色小恐龙",
 			LastModifier:    "迷失的蓝色小恐龙",
 			SonArr:          sonArr,
@@ -136,7 +137,7 @@ func HandleGetCatalogueSon(c *gin.Context) { //非递归获取子目录
 		middleware.Success(c, catalogue.GetCatalogueSonResponse{
 			RootCatalogueID: "",
 			CatalogueName:   "",
-			Description:     "这里是顶层目录",
+			Description:     "这里是顶层目录，其下不能有文章，只能有子目录",
 			CreateBy:        "迷失的蓝色小恐龙",
 			LastModifier:    "迷失的蓝色小恐龙",
 			SonArr:          sonArr,
@@ -412,29 +413,26 @@ func HandleDeleteCatalogue(c *gin.Context) {
 		return
 	}
 
-	var req catalogue.DeleteCatalogueRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		middleware.Fail(c, serviceErr.RequestErr)
-		return
-	}
-	if len(req.CatalogueID) == 0 || catalogues.CheckCatalogueExist(req.CatalogueID) == nil {
+	catalogueID := c.Param("catalogueID")
+	if len(catalogueID) == 0 || catalogues.CheckCatalogueExist(catalogueID) == nil {
 		middleware.FailWithCode(c, 40218, "目录不存在")
 		return
 	}
-	err := catalogues.DeleteCatalogue(req.CatalogueID)
+
+	err := catalogues.DeleteCatalogue(catalogueID, uid)
 	if err != nil {
 		middleware.Fail(c, serviceErr.InternalErr)
 		return
 	}
 	//删除目录后，删除目录下的所有文件
 	var tempArticleArr []article.GetArticleInfoResponse
-	err, tempArticleArr = GetArticlesByCatalogueID(req.CatalogueID)
+	err, tempArticleArr = GetArticlesByCatalogueID(catalogueID)
 	if err != nil {
 		middleware.Fail(c, serviceErr.InternalErr)
 		return
 	}
 	for _, v := range tempArticleArr {
-		err = articles.DeleteArticle(v.ID)
+		err = articles.DeleteArticle(v.ID, uid)
 		if err != nil {
 			middleware.Fail(c, serviceErr.InternalErr)
 			return

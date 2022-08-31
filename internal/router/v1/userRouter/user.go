@@ -34,7 +34,7 @@ func InitUserRouter(e *gin.Engine) {
 			userGroup.POST("/update/status", user.HandleUpdateStatus)
 			userGroup.POST("/update/email", user.HandleUpdateEmail)
 
-			userGroup.GET("/delete", user.HandleDelAccount)
+			userGroup.DELETE("/delete", user.HandleDelAccount)
 		}
 	}
 }

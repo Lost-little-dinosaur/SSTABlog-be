@@ -18,7 +18,7 @@ func InitCatalogueRouter(e *gin.Engine) {
 		catalogues.POST("/updateName", catalogueHandle.HandleUpdateCatalogueName)
 		catalogues.POST("/updateDescription", catalogueHandle.HandleUpdateCatalogueDescription)
 		catalogues.POST("/updateFather", catalogueHandle.HandleUpdateCatalogueFather)
-		catalogues.POST("/deleteCatalogue", catalogueHandle.HandleDeleteCatalogue)
+		catalogues.DELETE("/deleteCatalogue", catalogueHandle.HandleDeleteCatalogue)
 	}
 
 }

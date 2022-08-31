@@ -1,6 +1,7 @@
 package catalogues
 
 import (
+	"github.com/wujunyi792/crispy-waffle-be/internal/controller/articles"
 	"github.com/wujunyi792/crispy-waffle-be/internal/db"
 	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
 	"github.com/wujunyi792/crispy-waffle-be/internal/model/Mysql"
@@ -93,8 +94,15 @@ func RenameCatalogue(id string, newCatalogueName string, uid string) error { //�
 	return GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("id = ?", id).Update("catalogue_name", newCatalogueName).Update("last_modifier", uid).Error
 }
 
-func DeleteCatalogue(id string) error { //todo 回收站功能
-	err := GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("id = ?", id).Delete(&Mysql.Catalogue{}).Error
+func DeleteCatalogue(id string, uid string) error { //todo 回收站功能
+	err := GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("id = ?", id).
+		Update("last_modifier", uid). //更新最后修改人
+		Delete(&Mysql.Catalogue{}).Error
+	if err != nil {
+		return err
+	}
+	//删除目录下的文章
+	err = articles.DeleteArticlesByCatalogueID(id, uid)
 	if err != nil {
 		return err
 	}
@@ -103,11 +111,14 @@ func DeleteCatalogue(id string) error { //todo 回收站功能
 	if err = GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Where("father_id = ?", id).Find(&catalogues).Error; err != nil {
 		return err
 	}
-	//todo 删除子目录下的文章
 
 	//递归删除子目录的子目录
 	for _, catalogue := range catalogues {
-		if err = DeleteCatalogue(catalogue.ID); err != nil {
+		if err = DeleteCatalogue(catalogue.ID, uid); err != nil {
+			return err
+		}
+		err = articles.DeleteArticlesByCatalogueID(catalogue.ID, uid)
+		if err != nil {
 			return err
 		}
 	}
@@ -159,6 +170,82 @@ func GetCatalogueRoute(id string) ([]string, error) { //获取目录路径
 		route = append(route, tempCatalogue.CatalogueName)
 	}
 	return route, nil
+}
+
+func GetDeletedCatalogue(uid string) ([]Mysql.Catalogue, error) {
+	var catalogues []Mysql.Catalogue
+	if err := GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Unscoped().Where("last_modifier = ? AND deleted_at IS NOT NULL", uid).Order("catalogue_name").Find(&catalogues).Error; err != nil { //默认对目录按照目录名称排序
+		return nil, err
+	}
+	return catalogues, nil
+}
+
+func CheckIfCatalogueDeleted(uid string, id string) error {
+	catalogue := &Mysql.Catalogue{}
+	if err := GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Unscoped().Where("last_modifier = ? AND deleted_at IS NOT NULL AND id = ?", uid, id).First(catalogue).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func DeleteCatalogueForever(id string) error { //永久删除目录
+	var err error
+	err = GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Unscoped().Where("id = ?", id).Delete(&Mysql.Catalogue{}).Error
+	if err != nil {
+		return err
+	}
+	var tempArticleArr []Mysql.Article
+	//删除当前目录下的文章
+	tempArticleArr, err = articles.GetDeletedArticlesByCatalogueID(id)
+	for _, tempArticle := range tempArticleArr {
+		err = articles.DeleteArticleForever(tempArticle.ID)
+		if err != nil {
+			return err
+		}
+	}
+	//删除当前目录下的子目录
+	var tempCatalogueArr []Mysql.Catalogue
+	err = GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Unscoped().Where("father_id = ?", id).Find(&tempCatalogueArr).Error
+	if err != nil {
+		return err
+	}
+	for _, tempCatalogue := range tempCatalogueArr {
+		err = DeleteCatalogueForever(tempCatalogue.ID) //递归调用
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func RestoreCatalogue(id string) error { //恢复目录
+	var err error
+	err = GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Unscoped().Where("id = ?", id).Update("deleted_at", nil).Error
+	if err != nil {
+		return err
+	}
+	//恢复当前目录下的文章
+	var tempArticleArr []Mysql.Article
+	tempArticleArr, err = articles.GetDeletedArticlesByCatalogueID(id)
+	for _, tempArticle := range tempArticleArr {
+		err = articles.RestoreArticle(tempArticle.ID)
+		if err != nil {
+			return err
+		}
+	}
+	//恢复当前目录下的子目录
+	var tempCatalogueArr []Mysql.Catalogue
+	err = GetManage().getGOrmDB().Model(&Mysql.Catalogue{}).Unscoped().Where("father_id = ?", id).Find(&tempCatalogueArr).Error
+	if err != nil {
+		return err
+	}
+	for _, tempCatalogue := range tempCatalogueArr {
+		err = RestoreCatalogue(tempCatalogue.ID) //递归调用
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 //func CheckCatalogueValidForUpdateName(id string, newName string) bool { //返回true表示存在

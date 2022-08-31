@@ -72,7 +72,7 @@ func HandleGetArticle(c *gin.Context) {
 		return
 	}
 	returnArticle, err := articles.GetArticleByID(articleID)
-	if err.Error() == "record not found" {
+	if err != nil && err.Error() == "record not found" {
 		middleware.FailWithCode(c, 40225, "找不到该文章")
 		return
 	} else if err != nil {
@@ -90,7 +90,7 @@ func HandleGetArticleInfo(c *gin.Context) {
 		return
 	}
 	returnArticle, err := articles.GetArticleByID(articleID)
-	if err.Error() == "record not found" {
+	if err != nil && err.Error() == "record not found" {
 		middleware.FailWithCode(c, 40225, "找不到该文章")
 		return
 	} else if err != nil {
@@ -111,26 +111,22 @@ func HandleGetArticleInfo(c *gin.Context) {
 }
 
 func HandleSearchArticle(c *gin.Context) {
-	var req article.SearchArticleRequest
-	var err error
-	if err = c.ShouldBindJSON(&req); err != nil {
-		middleware.Fail(c, serviceErr.RequestErr)
-		return
-	}
-	if len(req.Keyword) == 0 {
+	keyword := c.Query("keyword")
+	myType := c.Query("type")
+	if len(keyword) == 0 {
 		middleware.FailWithCode(c, 40221, "搜索关键词不能为空")
 		return
 	}
-	if req.Type == "description" {
-		articleArr, err := articles.SearchArticlesDescription(req.Keyword)
+	if myType == "description" {
+		articleArr, err := articles.SearchArticlesDescription(keyword)
 		if err != nil {
 			middleware.Fail(c, serviceErr.InternalErr)
 			return
 		}
 		middleware.Success(c, articleArr)
 		return
-	} else if req.Type == "content" {
-		articleArr, err := articles.SearchArticlesContent(req.Keyword)
+	} else if myType == "content" {
+		articleArr, err := articles.SearchArticlesContent(keyword)
 		if err != nil {
 			middleware.Fail(c, serviceErr.InternalErr)
 			return
@@ -138,7 +134,7 @@ func HandleSearchArticle(c *gin.Context) {
 		middleware.Success(c, articleArr)
 		return
 	} else { //默认搜索标题
-		articleArr, err := articles.SearchArticlesTitle(req.Keyword)
+		articleArr, err := articles.SearchArticlesTitle(keyword)
 		if err != nil {
 			middleware.Fail(c, serviceErr.InternalErr)
 			return
@@ -224,14 +220,9 @@ func HandleDeleteArticle(c *gin.Context) {
 		middleware.FailWithCode(c, 40216, "对不起，您没有权限")
 		return
 	}
-	var req article.DeleteArticleRequest
-	var err error
-	if err = c.ShouldBindJSON(&req); err != nil {
-		middleware.Fail(c, serviceErr.RequestErr)
-		return
-	}
-	tempFlag, tempString := articles.CheckArticleExistByID(req.ArticleID)
-	if len(req.ArticleID) == 0 || !tempFlag {
+	articleID := c.Query("articleID")
+	tempFlag, tempString := articles.CheckArticleExistByID(articleID)
+	if len(articleID) == 0 || !tempFlag {
 		middleware.FailWithCode(c, 40225, "找不到该文章")
 		return
 	}
@@ -239,7 +230,7 @@ func HandleDeleteArticle(c *gin.Context) {
 		middleware.FailWithCode(c, 40216, "对不起，您没有权限")
 		return
 	}
-	if err = articles.DeleteArticle(req.ArticleID); err != nil {
+	if err := articles.DeleteArticle(articleID, uid); err != nil {
 		middleware.Fail(c, serviceErr.InternalErr)
 		return
 	}

@@ -15,6 +15,6 @@ func InitArticleRouter(e *gin.Engine) {
 	{
 		article.POST("/update", articleHandle.HandleUpdateArticle)
 		article.POST("/add", articleHandle.HandleAddArticle)
-		article.POST("/delete", articleHandle.HandleDeleteArticle)
+		article.DELETE("/delete", articleHandle.HandleDeleteArticle)
 	}
 }

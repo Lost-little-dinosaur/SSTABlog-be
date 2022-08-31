@@ -58,7 +58,3 @@ type UpdateCatalogueParentRequest struct {
 	CatalogueID string `json:"catalogueID"`
 	NewFatherID string `json:"newFatherID"`
 }
-
-type DeleteCatalogueRequest struct {
-	CatalogueID string `json:"catalogueID"`
-}

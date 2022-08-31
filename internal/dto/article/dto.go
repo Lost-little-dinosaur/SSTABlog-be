@@ -8,7 +8,7 @@ type AddArticleRequest struct {
 	Content     string `json:"content"`
 }
 
-type Article struct {
+type Article struct { //精简版ArticleInfo
 	Title         string `json:"title"`
 	Cover         string `json:"cover"`
 	CreateBy      string `json:"createBy"`
@@ -32,19 +32,10 @@ type GetArticleInfoResponse struct {
 	PraiseNumber  int    `json:"praiseNumber"`
 }
 
-type SearchArticleRequest struct {
-	Type    string `json:"type"`
-	Keyword string `json:"keyword"`
-}
-
 type UpdateArticleRequest struct {
 	ArticleID   string `json:"articleID"`
 	Title       string `json:"title"`
 	Cover       string `json:"cover"`
 	Description string `json:"description"`
 	Content     string `json:"content"`
-}
-
-type DeleteArticleRequest struct {
-	ArticleID string `json:"articleID"`
 }
