@@ -444,12 +444,12 @@ func HandleDeleteCatalogue(c *gin.Context) {
 
 func HandleSearchCataloogue(c *gin.Context) { //todo 分页、文章查询
 	keyWord := c.Query("keyWord")
-	searchRange := c.Query("searchRange")
+	myType := c.Query("type")
 	if len(keyWord) == 0 {
 		middleware.FailWithCode(c, 40221, "搜索关键词不能为空")
 		return
 	}
-	if searchRange == "description" {
+	if myType == "description" {
 		returnCatalogues, err := catalogues.SearchCatalogueByDescription(keyWord)
 		if err != nil {
 			middleware.Fail(c, serviceErr.InternalErr)
