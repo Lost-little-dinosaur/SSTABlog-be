@@ -71,24 +71,28 @@ func HandleRegister(c *gin.Context) {
 		return
 	}
 
-	//if users.CheckPhoneExist(req.Phone) {
-	//	middleware.FailWithCode(c, 40201, "手机号已存在")
-	//	return
-	//}
-	//
-	//err := check.PasswordStrengthCheck(6, 20, 3, req.Password) //密码强度检查
-	//if err != nil {
-	//	middleware.FailWithCode(c, 40202, err.Error())
-	//	return
-	//}
-	//
-	//code, err := redis.GetRedis().Get(req.Phone + "_register")
-	//if err != nil || code != req.Code {
-	//	middleware.Fail(c, serviceErr.CodeErr)
-	//	return
-	//}
-	//
-	//redis.GetRedis().RemoveKey(req.Phone+"_register", false)
+	if users.CheckPhoneExist(req.Phone) {
+		middleware.FailWithCode(c, 40201, "手机号已存在")
+		return
+	}
+	var err error
+	var code string
+	err = check.PasswordStrengthCheck(6, 20, 3, req.Password) //密码强度检查
+	if err != nil {
+		middleware.FailWithCode(c, 40202, err.Error())
+		return
+	}
+
+	code, err = redis.GetRedis().Get(req.Phone + "_register")
+	if err != nil || code != req.Code {
+		middleware.Fail(c, serviceErr.CodeErr)
+		return
+	}
+
+	err = redis.GetRedis().RemoveKey(req.Phone+"_register", false)
+	if err != nil {
+		return
+	}
 
 	salt := xrandom.GetRandom(5, xrandom.RAND_ALL)
 	entity := Mysql.User{
@@ -99,7 +103,7 @@ func HandleRegister(c *gin.Context) {
 		Password:  crypto.PasswordGen(req.Password, salt),
 		Salt:      salt,
 	}
-	err := users.RegisterUser(&entity)
+	err = users.RegisterUser(&entity)
 	if err != nil {
 		middleware.Fail(c, serviceErr.InternalErr)
 		return
@@ -453,10 +457,27 @@ func HandleGetUserInfo(c *gin.Context) { //获取用户信息
 		middleware.FailWithCode(c, 40214, "请先登录")
 		return
 	}
+	uid := cuid.(string)
 	entity := Mysql.User{}
 	entity.ID = cuid.(string)
 	users.GetEntity(&entity)
-	middleware.Success(c, entity)
+	permissions := users.GetPermission(uid)
+	if permissions == nil {
+		middleware.Fail(c, serviceErr.InternalErr)
+		return
+	}
+	middleware.Success(c, user.GetUserInfoResponse{
+		Avatar:     entity.Avatar,
+		Email:      entity.Email,
+		StudentID:  entity.StudentID,
+		Signature:  entity.Signature,
+		RealName:   entity.RealName,
+		NickName:   entity.NickName,
+		Phone:      entity.Phone,
+		Sex:        entity.Sex,
+		Permission: permissions[0], //权限暂时只能有一个
+
+	})
 }
 
 func HandleDelAccount(c *gin.Context) {

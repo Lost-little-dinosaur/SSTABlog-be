@@ -1,5 +1,17 @@
 package user
 
+type GetUserInfoResponse struct {
+	RealName   string `json:"realName"`
+	StudentID  string `json:"studentID"`
+	NickName   string `json:"nickName" gorm:"unique"`
+	Sex        int    `json:"sex"`
+	Phone      string `json:"phone" gorm:"unique"`
+	Email      string `json:"email"`
+	Signature  string `json:"signature"`
+	Status     string `json:"status"`
+	Avatar     string `json:"avatar"`
+	Permission string `json:"permission"`
+}
 type SendCode struct {
 	Phone        string `json:"phone" binding:"required"`
 	CaptchaId    string `json:"captchaId" binding:"required"`
