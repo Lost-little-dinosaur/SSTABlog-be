@@ -32,7 +32,7 @@ func MainRouter(e *gin.Engine) {
 			Proto:      c.Request.Proto,
 			RemoteAddr: c.Request.RemoteAddr,
 			Message:    fmt.Sprintf("Welcome to %s, version %s.", config.GetConfig().ProgramName, config.GetConfig().VERSION),
-			Test:       "test19",
+			Test:       "test20",
 		}
 		middleware.Success(c, data)
 	})
