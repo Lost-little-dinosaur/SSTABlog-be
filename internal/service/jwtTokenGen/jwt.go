@@ -1,9 +1,9 @@
 package jwtTokenGen
 
 import (
+	"SSTABlog-be/config"
 	"errors"
 	"github.com/golang-jwt/jwt"
-	"github.com/wujunyi792/crispy-waffle-be/config"
 	"time"
 )
 

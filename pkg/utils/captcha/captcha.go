@@ -1,8 +1,8 @@
 package captcha
 
 import (
+	"SSTABlog-be/internal/logger"
 	"github.com/mojocn/base64Captcha"
-	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
 )
 
 type Result struct {

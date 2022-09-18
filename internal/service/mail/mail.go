@@ -1,9 +1,9 @@
 package mail
 
 import (
+	"SSTABlog-be/config"
+	"SSTABlog-be/internal/logger"
 	"fmt"
-	"github.com/wujunyi792/crispy-waffle-be/config"
-	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
 	"gopkg.in/gomail.v2"
 	"time"
 )

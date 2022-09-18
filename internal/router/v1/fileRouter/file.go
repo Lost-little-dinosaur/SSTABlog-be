@@ -1,8 +1,8 @@
 package fileRouter
 
 import (
+	"SSTABlog-be/internal/handle/baseHandle/fileHandle"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/handle/baseHandle/fileHandle"
 )
 
 func InitFileRouter(e *gin.Engine) {

@@ -1,9 +1,9 @@
 package catalogueRouter
 
 import (
+	"SSTABlog-be/internal/handle/catalogueHandle"
+	"SSTABlog-be/internal/middleware"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/handle/catalogueHandle"
-	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
 )
 
 func InitCatalogueRouter(e *gin.Engine) {

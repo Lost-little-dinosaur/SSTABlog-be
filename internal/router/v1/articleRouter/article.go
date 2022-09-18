@@ -1,9 +1,9 @@
 package articleRouter
 
 import (
+	"SSTABlog-be/internal/handle/articleHandle"
+	"SSTABlog-be/internal/middleware"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/handle/articleHandle"
-	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
 )
 
 func InitArticleRouter(e *gin.Engine) {

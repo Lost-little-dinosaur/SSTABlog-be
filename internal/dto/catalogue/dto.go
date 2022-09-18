@@ -1,7 +1,7 @@
 package catalogue
 
 import (
-	"github.com/wujunyi792/crispy-waffle-be/internal/dto/article"
+	"SSTABlog-be/internal/dto/article"
 	"time"
 )
 

@@ -1,8 +1,8 @@
 package recycleBin
 
 import (
-	"github.com/wujunyi792/crispy-waffle-be/internal/dto/article"
-	"github.com/wujunyi792/crispy-waffle-be/internal/model/Mysql"
+	"SSTABlog-be/internal/dto/article"
+	"SSTABlog-be/internal/model/Mysql"
 )
 
 type GetRecycleBinResponse struct {

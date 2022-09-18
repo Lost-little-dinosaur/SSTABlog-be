@@ -1,14 +1,14 @@
 package tecentCMS
 
 import (
+	"SSTABlog-be/config"
+	"SSTABlog-be/internal/logger"
 	"encoding/json"
 	"fmt"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
 	sms "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sms/v20210111" // 引入sms
-	"github.com/wujunyi792/crispy-waffle-be/config"
-	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
 )
 
 func init() {

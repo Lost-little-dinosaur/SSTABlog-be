@@ -1,4 +1,4 @@
-module github.com/wujunyi792/crispy-waffle-be
+module SSTABlog-be
 
 go 1.17
 

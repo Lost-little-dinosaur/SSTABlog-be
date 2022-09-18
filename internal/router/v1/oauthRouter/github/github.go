@@ -1,9 +1,9 @@
 package github
 
 import (
+	"SSTABlog-be/internal/handle/oauth/github"
+	"SSTABlog-be/internal/middleware"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/handle/oauth/github"
-	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
 )
 
 func InitGithubRouter(e *gin.RouterGroup) {

@@ -1,9 +1,9 @@
 package middleware
 
 import (
+	"SSTABlog-be/internal/dto/common"
+	"SSTABlog-be/internal/dto/err"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/dto/common"
-	"github.com/wujunyi792/crispy-waffle-be/internal/dto/err"
 	"net/http"
 )
 

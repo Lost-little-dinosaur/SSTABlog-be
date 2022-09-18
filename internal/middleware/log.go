@@ -1,9 +1,9 @@
 package middleware
 
 import (
+	"SSTABlog-be/internal/logger"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
 	"time"
 )
 

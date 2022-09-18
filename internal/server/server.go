@@ -1,13 +1,13 @@
 package server
 
 import (
+	"SSTABlog-be/config"
+	_ "SSTABlog-be/internal/corn"
+	"SSTABlog-be/internal/logger"
+	"SSTABlog-be/internal/middleware"
+	"SSTABlog-be/internal/redis"
+	v1 "SSTABlog-be/internal/router/v1"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/config"
-	_ "github.com/wujunyi792/crispy-waffle-be/internal/corn"
-	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
-	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
-	"github.com/wujunyi792/crispy-waffle-be/internal/redis"
-	v1 "github.com/wujunyi792/crispy-waffle-be/internal/router/v1"
 )
 
 var E *gin.Engine

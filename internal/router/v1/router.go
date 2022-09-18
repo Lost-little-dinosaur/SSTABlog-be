@@ -1,18 +1,18 @@
 package v1
 
 import (
+	"SSTABlog-be/config"
+	"SSTABlog-be/internal/middleware"
+	"SSTABlog-be/internal/router/v1/articleRouter"
+	"SSTABlog-be/internal/router/v1/baseServiceRouter"
+	"SSTABlog-be/internal/router/v1/catalogueRouter"
+	"SSTABlog-be/internal/router/v1/draftBoxRouter"
+	"SSTABlog-be/internal/router/v1/fileRouter"
+	"SSTABlog-be/internal/router/v1/oauthRouter"
+	"SSTABlog-be/internal/router/v1/recycleBinRouter"
+	"SSTABlog-be/internal/router/v1/userRouter"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/config"
-	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
-	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/articleRouter"
-	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/baseServiceRouter"
-	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/catalogueRouter"
-	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/draftBoxRouter"
-	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/fileRouter"
-	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/oauthRouter"
-	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/recycleBinRouter"
-	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/userRouter"
 )
 
 func MainRouter(e *gin.Engine) {
@@ -32,7 +32,7 @@ func MainRouter(e *gin.Engine) {
 			Proto:      c.Request.Proto,
 			RemoteAddr: c.Request.RemoteAddr,
 			Message:    fmt.Sprintf("Welcome to %s, version %s.", config.GetConfig().ProgramName, config.GetConfig().VERSION),
-			Test:       "test16",
+			Test:       "test17",
 		}
 		middleware.Success(c, data)
 	})

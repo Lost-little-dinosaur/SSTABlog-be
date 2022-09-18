@@ -1,14 +1,14 @@
 package oss
 
 import (
+	"SSTABlog-be/config"
+	"SSTABlog-be/internal/logger"
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/json"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	uuid "github.com/satori/go.uuid"
-	"github.com/wujunyi792/crispy-waffle-be/config"
-	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
 	"hash"
 	"io"
 	"path"

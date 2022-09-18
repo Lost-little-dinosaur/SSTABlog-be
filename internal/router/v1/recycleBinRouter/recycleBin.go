@@ -1,9 +1,9 @@
 package recycleBinRouter
 
 import (
+	"SSTABlog-be/internal/handle/recycleBin"
+	"SSTABlog-be/internal/middleware"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/handle/recycleBin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
 )
 
 func InitRecycleBinRouter(e *gin.Engine) {

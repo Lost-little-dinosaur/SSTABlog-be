@@ -1,8 +1,8 @@
 package oauthRouter
 
 import (
+	"SSTABlog-be/internal/router/v1/oauthRouter/github"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/oauthRouter/github"
 )
 
 func InitOauthRouter(e *gin.Engine) {

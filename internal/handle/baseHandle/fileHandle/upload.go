@@ -1,9 +1,9 @@
 package fileHandle
 
 import (
+	"SSTABlog-be/internal/middleware"
+	"SSTABlog-be/internal/service/oss"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
-	"github.com/wujunyi792/crispy-waffle-be/internal/service/oss"
 )
 
 func HandleGetAliUploadToken(c *gin.Context) {

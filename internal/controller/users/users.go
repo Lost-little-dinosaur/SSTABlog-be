@@ -1,10 +1,10 @@
 package users
 
 import (
+	"SSTABlog-be/internal/db"
+	"SSTABlog-be/internal/logger"
+	"SSTABlog-be/internal/model/Mysql"
 	"errors"
-	"github.com/wujunyi792/crispy-waffle-be/internal/db"
-	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
-	"github.com/wujunyi792/crispy-waffle-be/internal/model/Mysql"
 	"gorm.io/gorm"
 	"sync"
 	"time"

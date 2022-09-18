@@ -1,9 +1,9 @@
 package draftBoxRouter
 
 import (
+	"SSTABlog-be/internal/handle/draftHandle"
+	"SSTABlog-be/internal/middleware"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/handle/draftHandle"
-	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
 )
 
 func InitDraftBoxRouter(e *gin.Engine) {

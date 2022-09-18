@@ -1,11 +1,11 @@
 package github
 
 import (
+	"SSTABlog-be/config"
+	"SSTABlog-be/internal/logger"
 	"errors"
 	"fmt"
 	"github.com/parnurzeal/gorequest"
-	"github.com/wujunyi792/crispy-waffle-be/config"
-	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
 	"net/http"
 	"net/url"
 	"time"

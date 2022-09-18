@@ -1,10 +1,10 @@
 package articles
 
 import (
-	"github.com/wujunyi792/crispy-waffle-be/internal/db"
-	"github.com/wujunyi792/crispy-waffle-be/internal/dto/article"
-	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
-	"github.com/wujunyi792/crispy-waffle-be/internal/model/Mysql"
+	"SSTABlog-be/internal/db"
+	"SSTABlog-be/internal/dto/article"
+	"SSTABlog-be/internal/logger"
+	"SSTABlog-be/internal/model/Mysql"
 	"gorm.io/gorm"
 	"sync"
 )

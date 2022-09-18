@@ -1,13 +1,13 @@
 package recycleBin
 
 import (
+	"SSTABlog-be/internal/controller/articles"
+	"SSTABlog-be/internal/controller/catalogues"
+	"SSTABlog-be/internal/controller/users"
+	serviceErr "SSTABlog-be/internal/dto/err"
+	"SSTABlog-be/internal/dto/recycleBin"
+	"SSTABlog-be/internal/middleware"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/controller/articles"
-	"github.com/wujunyi792/crispy-waffle-be/internal/controller/catalogues"
-	"github.com/wujunyi792/crispy-waffle-be/internal/controller/users"
-	serviceErr "github.com/wujunyi792/crispy-waffle-be/internal/dto/err"
-	"github.com/wujunyi792/crispy-waffle-be/internal/dto/recycleBin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
 )
 
 func HandleGetRecycleBin(c *gin.Context) {

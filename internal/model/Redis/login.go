@@ -1,9 +1,9 @@
 package Redis
 
 import (
+	"SSTABlog-be/internal/logger"
+	"SSTABlog-be/internal/service/github"
 	"encoding/json"
-	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
-	"github.com/wujunyi792/crispy-waffle-be/internal/service/github"
 )
 
 type GithubLogin struct {

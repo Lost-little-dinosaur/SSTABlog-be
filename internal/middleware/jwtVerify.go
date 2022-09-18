@@ -1,9 +1,9 @@
 package middleware
 
 import (
+	err2 "SSTABlog-be/internal/dto/err"
+	"SSTABlog-be/internal/service/jwtTokenGen"
 	"github.com/gin-gonic/gin"
-	err2 "github.com/wujunyi792/crispy-waffle-be/internal/dto/err"
-	"github.com/wujunyi792/crispy-waffle-be/internal/service/jwtTokenGen"
 )
 
 func JwtVerify(c *gin.Context) {

@@ -1,8 +1,8 @@
 package baseServiceRouter
 
 import (
+	"SSTABlog-be/internal/handle/baseHandle/captchaHandle"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/handle/baseHandle/captchaHandle"
 )
 
 func InitBaseServiceRouter(e *gin.Engine) {

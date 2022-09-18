@@ -1,9 +1,9 @@
 package userRouter
 
 import (
+	user "SSTABlog-be/internal/handle/userHandle"
+	"SSTABlog-be/internal/middleware"
 	"github.com/gin-gonic/gin"
-	user "github.com/wujunyi792/crispy-waffle-be/internal/handle/userHandle"
-	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
 )
 
 func InitUserRouter(e *gin.Engine) {

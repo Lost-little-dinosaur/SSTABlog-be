@@ -1,8 +1,8 @@
 package sonyflake
 
 import (
+	"SSTABlog-be/internal/logger"
 	"github.com/sony/sonyflake"
-	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
 )
 
 var flake *sonyflake.Sonyflake

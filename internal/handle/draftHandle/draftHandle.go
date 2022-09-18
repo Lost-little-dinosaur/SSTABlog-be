@@ -1,13 +1,13 @@
 package draftHandle
 
 import (
+	"SSTABlog-be/internal/controller/draftBoxs"
+	"SSTABlog-be/internal/controller/users"
+	"SSTABlog-be/internal/dto/draftBox"
+	serviceErr "SSTABlog-be/internal/dto/err"
+	"SSTABlog-be/internal/middleware"
+	"SSTABlog-be/internal/model/Mysql"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/controller/draftBoxs"
-	"github.com/wujunyi792/crispy-waffle-be/internal/controller/users"
-	"github.com/wujunyi792/crispy-waffle-be/internal/dto/draftBox"
-	serviceErr "github.com/wujunyi792/crispy-waffle-be/internal/dto/err"
-	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
-	"github.com/wujunyi792/crispy-waffle-be/internal/model/Mysql"
 )
 
 func HandleAddDraft(c *gin.Context) {

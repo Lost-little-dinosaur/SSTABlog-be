@@ -1,8 +1,8 @@
 package db
 
 import (
-	"github.com/wujunyi792/crispy-waffle-be/config"
-	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
+	"SSTABlog-be/config"
+	"SSTABlog-be/internal/logger"
 	"gorm.io/gorm"
 )
 

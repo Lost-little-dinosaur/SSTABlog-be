@@ -1,15 +1,15 @@
 package catalogueHandle
 
 import (
+	"SSTABlog-be/internal/controller/articles"
+	"SSTABlog-be/internal/controller/catalogues"
+	"SSTABlog-be/internal/controller/users"
+	"SSTABlog-be/internal/dto/article"
+	"SSTABlog-be/internal/dto/catalogue"
+	serviceErr "SSTABlog-be/internal/dto/err"
+	"SSTABlog-be/internal/middleware"
+	"SSTABlog-be/internal/model/Mysql"
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/crispy-waffle-be/internal/controller/articles"
-	"github.com/wujunyi792/crispy-waffle-be/internal/controller/catalogues"
-	"github.com/wujunyi792/crispy-waffle-be/internal/controller/users"
-	"github.com/wujunyi792/crispy-waffle-be/internal/dto/article"
-	"github.com/wujunyi792/crispy-waffle-be/internal/dto/catalogue"
-	serviceErr "github.com/wujunyi792/crispy-waffle-be/internal/dto/err"
-	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
-	"github.com/wujunyi792/crispy-waffle-be/internal/model/Mysql"
 	"time"
 )
 
