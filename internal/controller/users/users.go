@@ -354,3 +354,9 @@ func PermissionCheck(id string, permission string) (exist bool) {
 		return false
 	}
 }
+
+func GetUserNameByID(id string) (error, string) {
+	var user Mysql.User
+	res := GetManage().getGOrmDB().Model(&Mysql.User{}).Where("id = ?", id).First(&user)
+	return res.Error, user.NickName
+}

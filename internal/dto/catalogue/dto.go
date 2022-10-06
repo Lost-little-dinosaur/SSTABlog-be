@@ -17,7 +17,7 @@ type GetCatalogueSonResponse struct {
 	LastModifier     string                           `json:"lastModifier"`
 	Description      string                           `json:"description"`
 	CreateBy         string                           `json:"createBy"`
-	CreateOrUpdateAt time.Time                        `json:"createOrUpdateAt"`
+	CreateOrUpdateAt string                           `json:"createOrUpdateAt"`
 	SonArr           []Son                            `json:"sonArr"`
 	ArticleArr       []article.GetArticleInfoResponse `json:"articleArr"`
 }
@@ -28,7 +28,7 @@ type Son struct {
 	CatalogueID      string                           `json:"catalogueID"`
 	CreateBy         string                           `json:"createBy"`
 	LastModifier     string                           `json:"lastModifier"`
-	CreateOrUpdateAt time.Time                        `json:"createOrUpdateAt"`
+	CreateOrUpdateAt string                           `json:"createOrUpdateAt"`
 	ArticleArr       []article.GetArticleInfoResponse `json:"articleArr"`
 	SonArr           []Son                            `json:"sonArr"`
 	//FatherID      string    `json:"fatherID"`

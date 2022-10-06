@@ -47,7 +47,7 @@ func HandleAddCatalogue(c *gin.Context) {
 
 	//验证fatherID是否存在
 	if len(req.FatherID) != 0 && catalogues.CheckCatalogueExist(req.FatherID) == nil {
-		middleware.FailWithCode(c, 4029, "父级目录不存在")
+		middleware.FailWithCode(c, 40231, "父级目录不存在")
 		return
 	}
 
@@ -119,7 +119,7 @@ func HandleGetAllCatalogueSon(c *gin.Context) { //todo 增加返回排序
 			LastModifier:     tempStruct.LastModifier,
 			Description:      tempStruct.Description,
 			CreateBy:         tempStruct.CreateBy,
-			CreateOrUpdateAt: tempStruct.UpdatedAt,
+			CreateOrUpdateAt: tempStruct.UpdatedAt.Format("2006-01-02 15:04:05"),
 			SonArr:           sonArr,
 			ArticleArr:       tempArticleArr, //当前目录下的文章
 		})
@@ -171,7 +171,7 @@ func HandleGetCatalogueSon(c *gin.Context) { //非递归获取子目录
 			LastModifier:     tempStruct.LastModifier,
 			Description:      tempStruct.Description,
 			CreateBy:         tempStruct.CreateBy,
-			CreateOrUpdateAt: tempStruct.UpdatedAt,
+			CreateOrUpdateAt: tempStruct.UpdatedAt.Format("2006.01.02 15:04:05"),
 			SonArr:           sonArr,
 			ArticleArr:       tempArticleArr,
 		})
@@ -181,6 +181,7 @@ func HandleGetCatalogueSon(c *gin.Context) { //非递归获取子目录
 
 func GetCatalogueSon(catalogueID string) (error, []catalogue.Son) { //非递归获取子目录
 	var err error
+	var tempNickName1, tempNickName2 string
 	var tempCatalogue []Mysql.Catalogue
 	var returnSonArr []catalogue.Son
 	var tempArticleArr []article.GetArticleInfoResponse
@@ -193,13 +194,21 @@ func GetCatalogueSon(catalogueID string) (error, []catalogue.Son) { //非递归�
 		if err != nil {
 			return err, nil
 		}
+		err, tempNickName1 = users.GetUserNameByID(v.CreateBy)
+		if err != nil {
+			return err, nil
+		}
+		err, tempNickName2 = users.GetUserNameByID(v.LastModifier)
+		if err != nil {
+			return err, nil
+		}
 		returnSonArr = append(returnSonArr, catalogue.Son{
 			CatalogueID:      v.ID,
 			CatalogueName:    v.CatalogueName,
 			Description:      v.Description,
-			CreateBy:         v.CreateBy,
-			LastModifier:     v.LastModifier,
-			CreateOrUpdateAt: v.UpdatedAt,
+			CreateBy:         tempNickName1,
+			LastModifier:     tempNickName2,
+			CreateOrUpdateAt: v.UpdatedAt.Format("2006.01.02 15:04:05"),
 			ArticleArr:       tempArticleArr,
 		})
 		tempArticleArr = nil
@@ -231,7 +240,7 @@ func GetAllCatalogueSon(catalogueID string) (error, []catalogue.Son) { //递归�
 			Description:      v.Description,
 			CreateBy:         v.CreateBy,
 			LastModifier:     v.LastModifier,
-			CreateOrUpdateAt: v.UpdatedAt,
+			CreateOrUpdateAt: v.UpdatedAt.Format("2006.01.02 15:04:05"),
 			SonArr:           tempArr,
 			ArticleArr:       tempArticleArr,
 		})
@@ -247,15 +256,16 @@ func GetArticlesByCatalogueID(catalogueID string) (error, []article.GetArticleIn
 	}
 	for _, vv := range articleArr {
 		tempArticleArr = append(tempArticleArr, article.GetArticleInfoResponse{
-			ID:            vv.ID,
-			Title:         vv.Title,
-			Cover:         vv.Cover,
-			CreateBy:      vv.CreateBy,
-			LastModifier:  vv.LastModifier,
-			CatalogueID:   vv.CatalogueID,
-			Description:   vv.Description,
-			CommentNumber: vv.CommentNumber,
-			PraiseNumber:  vv.PraiseNumber,
+			ID:               vv.ID,
+			Title:            vv.Title,
+			Cover:            vv.Cover,
+			CreateBy:         vv.CreateBy,
+			LastModifier:     vv.LastModifier,
+			CreateOrUpdateAt: vv.UpdatedAt.Format("2006-01-02 15:04:05"),
+			CatalogueID:      vv.CatalogueID,
+			Description:      vv.Description,
+			CommentNumber:    vv.CommentNumber,
+			PraiseNumber:     vv.PraiseNumber,
 		})
 	}
 	return err, tempArticleArr

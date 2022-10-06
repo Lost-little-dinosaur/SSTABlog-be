@@ -1,6 +1,7 @@
 package articles
 
 import (
+	"SSTABlog-be/internal/controller/users"
 	"SSTABlog-be/internal/db"
 	"SSTABlog-be/internal/dto/article"
 	"SSTABlog-be/internal/logger"
@@ -125,8 +126,20 @@ func GetArticleCatalogueIDAndTitleByID(id string) (string, string, error) {
 
 func GetArticlesByCatalogueID(catalogueID string) ([]Mysql.Article, error) {
 	articles := make([]Mysql.Article, 0)
-	if err := GetManage().getGOrmDB().Model(&Mysql.Article{}).Where("catalogue_id = ?", catalogueID).Find(&articles).Error; err != nil {
+	var err error
+	if err = GetManage().getGOrmDB().Model(&Mysql.Article{}).Where("catalogue_id = ?", catalogueID).Find(&articles).Error; err != nil {
 		return nil, err
+	}
+	for i := 0; i < len(articles); i++ {
+		err, articles[i].CreateBy = users.GetUserNameByID(articles[i].CreateBy)
+		if err != nil {
+			return nil, err
+		}
+		err, articles[i].LastModifier = users.GetUserNameByID(articles[i].LastModifier)
+		if err != nil {
+			return nil, err
+		}
+
 	}
 	return articles, nil
 }
